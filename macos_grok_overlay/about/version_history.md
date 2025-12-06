@@ -7,3 +7,4 @@
 | 0.0.15<br>March 2025 | Added DMG style application for easier installation <br> without python. |
 | 0.0.16<br>March 2025 | Fixed login via X.com, updated menu items to be <br> easier to interpret, added the ability to clear the <br> web cache in case of issues. Added stubs for later <br> support of camera and microphone if the web app <br> allows voice mode. |
 | 0.0.17<br>November 2025 | Support for macOS 26 Tahoe and voice mode (via <br> microphone permission request). |
+| 0.0.18<br>December 2025 | Rebuilt the DMG launcher as a universal binary so <br> it runs cleanly on Intel Macs and Apple Silicon <br> hardware (M1 through M3 Max). |
