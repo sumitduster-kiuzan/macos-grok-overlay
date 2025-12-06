@@ -1,5 +1,7 @@
-pyobjc-core
-pyobjc-framework-Cocoa
-pyobjc-framework-WebKit
-pyobjc-framework-Quartz
-pyobjc-framework-ApplicationServices
+pyobjc-core; platform_system=="Darwin"
+pyobjc-framework-Cocoa; platform_system=="Darwin"
+pyobjc-framework-WebKit; platform_system=="Darwin"
+pyobjc-framework-Quartz; platform_system=="Darwin"
+pyobjc-framework-ApplicationServices; platform_system=="Darwin"
+PySide6>=6.7; platform_system=="Windows"
+keyboard>=0.13; platform_system=="Windows"

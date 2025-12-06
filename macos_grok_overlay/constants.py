@@ -1,11 +1,19 @@
 
 # Apple libraries
-from Quartz import (
-    kCGEventFlagMaskAlternate,
-    kCGEventFlagMaskCommand,
-    kCGEventFlagMaskControl,
-    kCGEventFlagMaskShift,
-)
+try:
+    from Quartz import (
+        kCGEventFlagMaskAlternate,
+        kCGEventFlagMaskCommand,
+        kCGEventFlagMaskControl,
+        kCGEventFlagMaskShift,
+    )
+except Exception:
+    # Quartz is only available on macOS. Define placeholders so the module can
+    # still be imported on other platforms where these constants are unused.
+    kCGEventFlagMaskAlternate = 0
+    kCGEventFlagMaskCommand = 0
+    kCGEventFlagMaskControl = 0
+    kCGEventFlagMaskShift = 0
 
 
 WEBSITE = "https://grok.com?referrer=macos-grok-overlay"

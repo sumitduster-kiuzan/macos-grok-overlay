@@ -5,17 +5,26 @@ import tempfile
 import traceback
 import functools
 import platform
-import objc
+try:
+    import objc
+except Exception:  # pragma: no cover - only used on macOS
+    class _ObjCStub:
+        __version__ = "unavailable"
+    objc = _ObjCStub()
 from pathlib import Path
 
 
 # Get a path for logging errors that is persistent.
 def get_log_dir():
-    # Set a persistent log directory in the user's home folder
-    log_dir = Path.home() / "Library" / "Logs" / "macos-grok-overlay"
-    # Create the directory if it doesn't exist
+    system = platform.system()
+    if system == "Darwin":
+        base = Path.home() / "Library" / "Logs"
+    elif system == "Windows":
+        base = Path(os.getenv("LOCALAPPDATA", Path.home()))
+    else:
+        base = Path(tempfile.gettempdir())
+    log_dir = Path(base) / "macos-grok-overlay" / "Logs"
     log_dir.mkdir(parents=True, exist_ok=True)
-    # Return a persistent path name (same file for error logs).
     return log_dir
 
 

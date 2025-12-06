@@ -3,13 +3,15 @@
 </p>
 
 <p align="center">
-A simple macOS overlay application for pinning <code>grok.com</code> to a dedicated window and key command <code>option+space</code>.
+A simple overlay application for pinning <code>grok.com</code> to a dedicated window and key command. Originally built for macOS, it now includes a native Windows 10/11 implementation with the same keyboard-driven workflow.
 </p>
 
 ![Launcher Sample](images/macos-grok-overlay.jpeg)
 
 
 ## Installation:
+
+### macOS
 
   The easiest approach is to download and execute the DMG installer (by clicking the image below) to place the program into your Applications folder.
 
@@ -41,16 +43,39 @@ macos-grok-overlay --install-startup
 
   And you're done! Now this should launch automatically and constantly run in the background. If you ever decide you do not want it, see the uninstall instructions below.
 
+### Windows 10/11
+
+1. Install the package (either from Command Prompt or PowerShell):
+
+```powershell
+py -m pip install macos-grok-overlay
+```
+
+2. Launch the overlay with:
+
+```powershell
+macos-grok-overlay
+```
+
+   The first launch downloads the embedded Qt WebEngine runtime. Once the window appears you can dismiss it with `Alt + Space` (the default trigger) or from the tray icon near the system clock.
+
+3. Optional but recommended:
+   - Use the tray menu → **Set New Trigger** if `Alt + Space` conflicts with another app.
+   - Use **Install Autolauncher** (or `macos-grok-overlay --install-startup`) to create a Task Scheduler entry so the overlay starts automatically whenever you log in.
+   - The tray menu includes **Clear Web Cache**, **Home**, and **Uninstall Autolauncher** just like the macOS menu bar.
+
+> **Note:** Global hotkeys rely on low-level keyboard hooks. On some systems Windows will prompt you to allow the terminal/PowerShell session to listen for keyboard events the first time you run the app.
+
 
 ## Usage
 
-  Once the application is launched, it should immediately open a window dedicated to `grok.com`. You'll need to log in there, but you should only need to do that once. After installing, pressing `Option + Space` while the window is open will hide it, and pressing it again at any point will reveal it and pin it as the top-most window overlay on top of other applications. This enables quick and easy access to Grok on macOS.
+  Once the application is launched, it immediately opens a window dedicated to `grok.com`. You'll need to log in there, but you should only need to do that once. After installing, pressing `Option + Space` on macOS or `Alt + Space` on Windows will hide it, and pressing it again at any point will reveal it and pin it as the top-most window overlay on top of other applications. Use the menubar icon (macOS) or the tray icon near the clock (Windows) to set a new trigger if you prefer a different combination.
 
 <video controls loop autoplay>
   <source src="https://github.com/tchlux/macos-grok-overlay/raw/main/images/macos-grok-overlay.mp4" type="video/mp4">
 </video>
 
-  There is a dropdown menu with basic options that shows when you click the menubar icon. Personally I find that using `Option + Space` to summon and dismiss the dialogue as needed is the most convenient.
+  There is a dropdown menu with basic options that shows when you click the menubar icon (macOS) or tray icon (Windows). Personally I find that using the global hotkey to summon and dismiss the dialogue as needed is the most convenient.
 
 <video controls loop autoplay>
   <source src="https://github.com/tchlux/macos-grok-overlay/raw/main/images/macos-grok-overlay-menu.mp4" type="video/mp4">
