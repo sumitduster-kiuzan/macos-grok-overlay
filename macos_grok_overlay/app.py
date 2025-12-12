@@ -62,6 +62,8 @@ class DragArea(NSView):
 class AppDelegate(NSObject):
     # The main application setup.
     def applicationDidFinishLaunching_(self, notification):
+        # About window is created lazily.
+        self.about_window = None
         # Run as accessory app
         NSApp.setActivationPolicy_(NSApplicationActivationPolicyAccessory)
         # Create a borderless, floating, resizable window
@@ -155,6 +157,10 @@ class AppDelegate(NSObject):
         )
         # Create status bar menu
         menu = NSMenu.alloc().init()
+        about_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_("About "+APP_TITLE, "showAbout:", "")
+        about_item.setTarget_(self)
+        menu.addItem_(about_item)
+        menu.addItem_(NSMenuItem.separatorItem())
         # Create and configure menu items with explicit targets
         show_item = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_("Show "+APP_TITLE, "showWindow:", "")
         show_item.setTarget_(self)
@@ -227,6 +233,126 @@ class AppDelegate(NSObject):
     # Hide the overlay and allow focus to return to the next visible application.
     def hideWindow_(self, sender):
         NSApp.hide_(None)
+
+    # Show a custom "About" window.
+    def showAbout_(self, sender):
+        if self.about_window is None:
+            self.about_window = self._createAboutWindow()
+        self.about_window.makeKeyAndOrderFront_(None)
+        NSApp.activateIgnoringOtherApps_(True)
+
+    def _createAboutWindow(self):
+        # Local import to avoid any startup/cycle issues.
+        try:
+            from . import __version__
+            version = __version__
+        except Exception:
+            version = "Unknown"
+
+        w, h = 420, 360
+        window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
+            NSMakeRect(0, 0, w, h),
+            NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable,
+            NSBackingStoreBuffered,
+            False,
+        )
+        window.setReleasedWhenClosed_(False)
+        window.setTitleVisibility_(NSWindowTitleHidden)
+        window.setTitlebarAppearsTransparent_(True)
+        window.setMovableByWindowBackground_(True)
+        window.center()
+
+        root = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, w, h))
+        root.setWantsLayer_(True)
+        root.layer().setBackgroundColor_(NSColor.windowBackgroundColor().CGColor())
+        window.setContentView_(root)
+
+        pad = 18
+        card = NSView.alloc().initWithFrame_(NSMakeRect(pad, pad, w - 2 * pad, h - 2 * pad))
+        card.setWantsLayer_(True)
+        card.layer().setCornerRadius_(18.0)
+        card.layer().setBackgroundColor_(NSColor.whiteColor().CGColor())
+        root.addSubview_(card)
+
+        card_w = card.frame().size.width
+        card_h = card.frame().size.height
+
+        # Logo
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        logo_black_path = os.path.join(script_dir, LOGO_BLACK_PATH)
+        logo = NSImage.alloc().initWithContentsOfFile_(logo_black_path)
+        logo_view = NSImageView.alloc().initWithFrame_(NSMakeRect((card_w - 84) / 2.0, card_h - 110, 84, 84))
+        logo_view.setImage_(logo)
+        logo_view.setImageScaling_(NSImageScaleProportionallyUpOrDown)
+        card.addSubview_(logo_view)
+
+        # Title
+        title = NSTextField.labelWithString_(APP_TITLE)
+        title.setFont_(NSFont.boldSystemFontOfSize_(30))
+        title.setAlignment_(NSTextAlignmentCenter)
+        title.setFrame_(NSMakeRect(0, card_h - 155, card_w, 34))
+        card.addSubview_(title)
+
+        # Version
+        version_label = NSTextField.labelWithString_(f"Version {version}")
+        version_label.setFont_(NSFont.systemFontOfSize_(12))
+        version_label.setTextColor_(NSColor.secondaryLabelColor())
+        version_label.setAlignment_(NSTextAlignmentCenter)
+        version_label.setFrame_(NSMakeRect(0, card_h - 178, card_w, 18))
+        card.addSubview_(version_label)
+
+        # Description
+        desc_text = f"A native macOS overlay for {APP_TITLE}.\nPress ⌥ Space to summon anywhere."
+        desc = NSTextField.alloc().initWithFrame_(NSMakeRect(34, card_h - 240, card_w - 68, 52))
+        desc.setEditable_(False)
+        desc.setSelectable_(False)
+        desc.setBezeled_(False)
+        desc.setDrawsBackground_(False)
+        desc.setStringValue_(desc_text)
+        desc.setFont_(NSFont.systemFontOfSize_(12))
+        desc.setTextColor_(NSColor.secondaryLabelColor())
+        desc.setAlignment_(NSTextAlignmentCenter)
+        desc.setLineBreakMode_(NSLineBreakByWordWrapping)
+        desc.setUsesSingleLineMode_(False)
+        card.addSubview_(desc)
+
+        # Credits box
+        box_h = 96
+        box = NSView.alloc().initWithFrame_(NSMakeRect(34, 54, card_w - 68, box_h))
+        box.setWantsLayer_(True)
+        box.layer().setCornerRadius_(12.0)
+        box.layer().setBackgroundColor_(NSColor.controlBackgroundColor().CGColor())
+        card.addSubview_(box)
+
+        credit_title = NSTextField.labelWithString_("tchlux  •  sumitduster")
+        credit_title.setFont_(NSFont.boldSystemFontOfSize_(14))
+        credit_title.setAlignment_(NSTextAlignmentCenter)
+        credit_title.setFrame_(NSMakeRect(0, box_h - 34, box.frame().size.width, 18))
+        box.addSubview_(credit_title)
+
+        credit_role = NSTextField.labelWithString_("Developers")
+        credit_role.setFont_(NSFont.systemFontOfSize_(12))
+        credit_role.setTextColor_(NSColor.secondaryLabelColor())
+        credit_role.setAlignment_(NSTextAlignmentCenter)
+        credit_role.setFrame_(NSMakeRect(0, box_h - 54, box.frame().size.width, 18))
+        box.addSubview_(credit_role)
+
+        credit_tagline = NSTextField.labelWithString_("Building intuitive apps")
+        credit_tagline.setFont_(NSFont.systemFontOfSize_(11))
+        credit_tagline.setTextColor_(NSColor.tertiaryLabelColor())
+        credit_tagline.setAlignment_(NSTextAlignmentCenter)
+        credit_tagline.setFrame_(NSMakeRect(0, 18, box.frame().size.width, 16))
+        box.addSubview_(credit_tagline)
+
+        # Footer
+        footer = NSTextField.labelWithString_("© 2025 Thomas C.H. Lux  •  Sumit Duster")
+        footer.setFont_(NSFont.systemFontOfSize_(11))
+        footer.setTextColor_(NSColor.tertiaryLabelColor())
+        footer.setAlignment_(NSTextAlignmentCenter)
+        footer.setFrame_(NSMakeRect(0, 22, card_w, 16))
+        card.addSubview_(footer)
+
+        return window
     
     # Go to the default landing website for the overlay (in case accidentally navigated away).
     def goToWebsite_(self, sender):
